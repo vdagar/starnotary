@@ -1,7 +1,7 @@
 /* Configure levelDB and define the function to get and put data into DB */
 
 const level = require('level');
-const chainDB = './registery/chain';
+const chainDB = './database/chain';
 const db = level(chainDB);
 
 /* ================== Persist data with LevelDB =================

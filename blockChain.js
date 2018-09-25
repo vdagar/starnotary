@@ -3,7 +3,7 @@
  * CRITERIA: Configure simpleChain.js with levelDB to persist blockchain dataset using the level Node.js library.
  */
 
-const leveldb = require('./levelSandbox')
+const chaindb = require('./levelSandbox')
 const Block = require('./block');
 
 /* ================= SHA256 with Crypto-js ===================
@@ -56,7 +56,7 @@ class Blockchain {
 		this.blockHeight = newBlock.height;
 
 		// Adding block object to levelDB
-		await leveldb.addBlockToLevelDB(newBlock.height, JSON.stringify(newBlock)).then((result) => {
+		await chaindb.addBlockToLevelDB(newBlock.height, JSON.stringify(newBlock)).then((result) => {
 			res = result;
 		}).catch(error => { res = error; });
 
@@ -67,7 +67,7 @@ class Blockchain {
 	 * CRITERIA : Modify getBlockHeight() function to retrieve current block height within the LevelDB chain.
 	 */
 	async getBlockHeight() {
-		return await leveldb.getBlockHeightFromLevelDB().then((height) => { return height; }).catch(error => { console.log(error); });
+		return await chaindb.getBlockHeightFromLevelDB().then((height) => { return height; }).catch(error => { console.log(error); });
 	}
 
 	/*
@@ -75,7 +75,7 @@ class Blockchain {
 	 */
 	async getBlock(blockHeight) {
 		// return object as a single string
-		return JSON.parse(await leveldb.getBlockFromLevelDB(blockHeight).then((block) => { return block }).catch(error => { console.log(error); }));
+		return JSON.parse(await chaindb.getBlockFromLevelDB(blockHeight).then((block) => { return block }).catch(error => { console.log(error); }));
 	}
 
 	/*
