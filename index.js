@@ -83,19 +83,19 @@ app.get('/block/:height', async (request, response) => {
 		let height = parseInt(request.params.height);
 
 		if (height < 0 || height === undefined) {
-			console.log("Height passed is : " + height);
+			throw new Error(`Invalid Height: ${height} passed`);
 		}
 
 		if (height > blockHeight) {
-			response.send("Height passed is greater then max height in the database");
+			throw new Error("Height passed is greater then max height");
 		} else {
-			let block = await blockchain.getBlock(request.params.height);
+			let block = await blockchain.getBlockByHeight(request.params.height);
 			response.send(block);
 		}
 	} catch (error) {
 		response.status(404).json ({
 			"status": 404,
-			"message": "Block Not Found. Please check passed block height\n"
+			"message": error.message
 		});
 	}
 });

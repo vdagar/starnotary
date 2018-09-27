@@ -67,15 +67,19 @@ class Blockchain {
 	 * CRITERIA : Modify getBlockHeight() function to retrieve current block height within the LevelDB chain.
 	 */
 	async getBlockHeight() {
-		return await chaindb.getBlockHeightFromLevelDB().then((height) => { return height; }).catch(error => { console.log(error); });
+		return await chaindb.getBlockHeight().then((height) => { return height; }).catch(error => { console.log(error); });
 	}
 
 	/*
-	 * CRITERIA : Modify getBlock() function to retrieve a block by it's block heigh within the LevelDB chain.
+	 * CRITERIA : Get star block by star block height with JSON response.
 	 */
 	async getBlockByHeight(blockHeight) {
 		// return object as a single string
-		return JSON.parse(await chaindb.getBlockFromLevelDB(blockHeight).then((block) => { return block }).catch(error => { console.log(error); }));
+		return await chaindb.getBlockByKey(blockHeight).then((block) => {
+			return block;
+		}).catch(error => {
+			console.log(error);
+		});
 	}
 
 	/*
@@ -105,7 +109,7 @@ class Blockchain {
 	 */
 	async validateBlock(blockHeight) {
 		// get block from level db
-		let block = await this.getBlock(blockHeight);
+		let block = await this.getBlockByHeight(blockHeight);
 
 		// save block hash
 		let blockHash = block.hash;
@@ -118,7 +122,6 @@ class Blockchain {
 
 		// Compare
 		if (blockHash === validBlockHash) {
-			//console.log(blockHash  + " === " + validBlockHash);
 			return true;
 		} else {
 			console.log('Block #' + blockHeight + ' invalid hash:\n' + blockHash + '<>' + validBlockHash);
@@ -142,8 +145,6 @@ class Blockchain {
 			// validate block
 			isValid = await this.validateBlock(block.height);
 
-			//console.log("Validating block : " + block.height);
-
 			if (!isValid) {
 				errorLog.push(block.height);
 			}
@@ -166,7 +167,6 @@ class Blockchain {
 				}
 			}
 		}
-
 
 		// uncomment these 3 lines to display chain after its validated
 		/*await leveldb.getChainFromLevelDB().then((blocks) => {

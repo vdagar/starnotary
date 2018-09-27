@@ -21,20 +21,24 @@ exports.addBlockToLevelDB = function (key, value) {
 	});
 }
 
-// Get data from levelDB with key
-exports.getBlockFromLevelDB = function (key) {
-	return new Promise(function (resolve, reject) {
-		db.get(key, function (error, value) {
+/*
+ * Get data from database with key
+ */
+exports.getBlockByKey = function (key) {
+	return new Promise((resolve, reject) => {
+		db.get(key, (error, value) => {
 			if (error) {
 				reject(error);
 			}
 
-			resolve(value);
+			block = JSON.parse(value);
+			block.body.star.storyDecoded = new Buffer(block.body.star.story, 'hex').toString();
+			resolve(block);
 		});
 	});
 }
 
-exports.getBlockHeightFromLevelDB = function () {
+exports.getBlockHeight = function () {
 	return new Promise(function (resolve, reject) {
 		let height = -1;
 
@@ -48,7 +52,7 @@ exports.getBlockHeightFromLevelDB = function () {
 	});
 }
 
-exports.getChainFromLevelDB = function () {
+exports.getBlockChain = function () {
 	return new Promise(function (resolve, reject) {
 		let dataArray = [];
 
