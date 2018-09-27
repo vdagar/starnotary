@@ -73,9 +73,20 @@ class Blockchain {
 	/*
 	 * CRITERIA : Modify getBlock() function to retrieve a block by it's block heigh within the LevelDB chain.
 	 */
-	async getBlock(blockHeight) {
+	async getBlockByHeight(blockHeight) {
 		// return object as a single string
 		return JSON.parse(await chaindb.getBlockFromLevelDB(blockHeight).then((block) => { return block }).catch(error => { console.log(error); }));
+	}
+
+	/*
+	 * CRITERIA: Get star block by wallet address (blockchain identity) with JSON response.
+	 */
+	async getBlockByAddress(address) {
+		return await chaindb.getBlockByAddress(address).then((blocks) => {
+			return blocks;
+		}).catch (error => {
+			return new Error(error.message);
+		});
 	}
 
 	/*

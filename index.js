@@ -196,3 +196,25 @@ app.post('/block', [validateNewRequest], async (request, response) => {
 
 	response.status(201).send(block);
 });
+
+/* ======================================================================
+ * |				Star Lookup				|
+ * =====================================================================*/
+
+/*
+ * CRITERIA: Get star block by hash with JSON response.
+ */
+app.get('/stars/address:address', async (request, response) => {
+	try {
+		const address = request.params.address.slice(1);
+		const blocks = await blockchain.getBlockByAddress(address);
+
+		response.send(blocks);
+	} catch (error) {
+		response.status(401).json({
+			"status": 401,
+			"message": "Star(s) Not Found"
+		});
+	}
+
+});

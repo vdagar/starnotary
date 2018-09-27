@@ -61,3 +61,29 @@ exports.getChainFromLevelDB = function () {
 		});
 	});
 }
+
+/*
+ * Get blocks from the database based on address.
+ */
+exports.getBlockByAddress = function(address) {
+	let addressBlocks = [];
+	let block;
+
+	return new Promise((resolve, reject) => {
+
+		db.createReadStream().on('data', (data) => {
+			if (!(parseInt(data.key) === 0)) {
+				block = JSON.parse(data.value);
+
+				if (block.body.address === address) {
+					block.body.star.storyDecoded = new Buffer(block.body.star.story, 'hex').toString();
+					addressBlocks.push(block);
+				}
+			}
+		}).on('error', (error) => {
+			reject(error);
+		}).on('close', () => {
+			resolve(addressBlocks);
+		})
+	});
+}
