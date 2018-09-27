@@ -43,6 +43,22 @@ validateSignature = async(request, response, next) => {
 }
 
 /*
+ * Using middleware pattern for validating new star registry is passed in the request as per the requirements
+ */
+validateNewRequest = async(request, response, next) => {
+	try {
+		const starRegistry = new StarRegistry(request);
+		starRegistry.validateNewRequest();
+		next();
+	} catch (error) {
+		response.status(404).json({
+			"status": 404,
+			"message": error.message
+		});
+	}
+}
+
+/*
  * CRITERIA: API Service Port Configuration. The project’s API service is configured to run on port 8000.
  * The default URL should remain private facing using localhost for connectivity (example: http://localhost:8000).
  */
@@ -84,31 +100,9 @@ app.get('/block/:height', async (request, response) => {
 	}
 });
 
-/*
- * CRITERIA: POST Block Endpoint. The web API contains a POST endpoint that allows posting a new block with
- * the data payload option to add data to the block body. Block body should support a string of text.
- */
-app.post('/block', async (request, response) => {
-	try {
-		if (request.body.body === "" || request.body.body === undefined) {
-			response.status(404).json({
-				"status": 404,
-				"message": "Block Body can not be empty. Please fill the body and try again"
-			});
-		}
-
-		await blockchain.addBlock(new Block(request.body.body));
-		let height = await blockchain.getBlockHeight();
-		let block  = await blockchain.getBlock(height);
-
-		response.send(block);
-	} catch(error) {
-		response.status(404).json({
-			"status": 404,
-			"message": "Block could not be added to the blockchain. Please try again"
-		});
-	}
-});
+/* ==============================================================================
+ * |			Blockchain ID validation routine			|
+ * =============================================================================*/
 
 /*
  * CRITERIA: Web API post endpoint validates request with JSON response.
@@ -152,7 +146,53 @@ app.post('/message-signature/validate', [validateAddress, validateSignature], as
 		console.log("error caught");
 		response.status(404).json({
 			"status": 404,
-			"message": error
+			"message": error.message
 		});
 	}
+});
+
+/* ======================================================================
+ * |			Star registration Endpoint			|
+ * =====================================================================*/
+
+/*
+ * CRITERIA: Web API Post Endpoint with JSON response.
+ */
+app.post('/block', [validateNewRequest], async (request, response) => {
+	const starRegistry = new StarRegistry(request);
+
+	try {
+		const isSignatureValid = await starRegistry.isMessageSignatureValid();
+
+		if (!isSignatureValid) {
+			throw new Error("Message Signature is not valid");
+		}
+
+	} catch(error) {
+		response.status(401).json({
+			"status": 401,
+			"message": error.message
+		});
+
+		return;
+	}
+
+	const starRequest = {address, star} = request.body;
+	const story = star.story;
+
+	starRequest.star = {
+		dec: star.dec,
+		ra: star.ra,
+		story: new Buffer.from(story).toString('hex'),
+		mag: star.mag,
+		con: star.con
+	}
+
+	await blockchain.addBlock(new Block(starRequest));
+	const blockHeight = await blockchain.getBlockHeight();
+	const block = await blockchain.getBlock(blockHeight);
+
+	starRegistry.invalidateAddress(address);
+
+	response.status(201).send(block);
 });

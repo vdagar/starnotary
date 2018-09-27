@@ -1,4 +1,6 @@
-
+/*
+ * Configure bitcoin and bitcoin message to verify the message signature
+ */
 const bitcoin = require('bitcoinjs-lib');
 const bitcoinMessage = require('bitcoinjs-message');
 
@@ -39,7 +41,12 @@ exports.saveNewRequestToDB = function (address) {
 	});
 }
 
-// Get data from levelDB with key
+/*
+ * Get validation request pending for the address. If no request is
+ * pending a new request will be created and saved in the database.
+ * If there is a request pending for the address then time left in
+ * validation window will be updated and sent to the user.
+ */
 exports.getPendingRequestFromDB = function (address) {
 	return new Promise((resolve, reject) => {
 		db.get(address, (error, result) => {
@@ -70,6 +77,9 @@ exports.getPendingRequestFromDB = function (address) {
 	});
 }
 
+/*
+ * Verfiy the message signature for the pending request for the address
+ */
 exports.verifySignatureFromDB = function(address, signature) {
 	return new Promise((resolve, reject) => {
 		db.get(address, (error, result) => {
@@ -113,5 +123,34 @@ exports.verifySignatureFromDB = function(address, signature) {
 				});
 			}
 		});
+	});
+}
+
+/*
+ * Check if message signature is valid for the address star is registered against
+ */
+exports.isSignatureValid = function(address) {
+	return new Promise((resolve, reject) => {
+		db.get(address).then((result) => {
+			result = JSON.parse(result);
+			resolve(result.messageSignature === 'valid');
+		}).catch ((error) => {
+			reject(new Error("Not Authorized"));
+		});
+	});
+}
+
+/*
+ * Remove the address from the database once a star is registered for that address.
+ */
+exports.invalidateAddress = function(address) {
+	return new Promise((resolve, reject) => {
+		db.del(address, (error) => {
+			if (error) {
+				reject(error);
+			}
+
+			resolve(address);
+		})
 	});
 }
