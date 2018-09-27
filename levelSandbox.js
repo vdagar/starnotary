@@ -87,3 +87,26 @@ exports.getBlockByAddress = function(address) {
 		})
 	});
 }
+
+/*
+ * Get blocks from database based on the hash value
+ */
+exports.getBlockByHash = function(hash) {
+
+	return new Promise((resolve, reject) => {
+		db.createReadStream().on('data', (data) => {
+			if (!(parseInt(data.key) === 0)) {
+				block = JSON.parse(data.value);
+
+				if (block.hash === hash) {
+					block.body.star.storyDecoded = new Buffer(block.body.star.story, 'hex').toString();
+					return resolve(block);
+				}
+			}
+		}).on('error', (error) => {
+			return reject(error);
+		}).on('close', () => {
+			return reject("Not Found");
+		});
+	});
+}

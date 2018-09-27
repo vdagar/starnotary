@@ -218,3 +218,21 @@ app.get('/stars/address:address', async (request, response) => {
 	}
 
 });
+
+/*
+ * CRITERIA: Get star block by hash with JSON response.
+ */
+app.get('/stars/hash:hash', async (request, response) => {
+
+	try {
+		const hash = request.params.hash.slice(1);
+		const blocks = await blockchain.getBlockByHash(hash);
+
+		response.send(blocks);
+	} catch(error)  {
+		response.status(404).json({
+			"status": 404,
+			"message": `No Star Registered for this hash: ${hash}`
+		});
+	}
+});

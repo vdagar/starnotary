@@ -90,6 +90,17 @@ class Blockchain {
 	}
 
 	/*
+	 * CRITERIA: Get star block by hash with JSON response.
+	 */
+	async getBlockByHash(hash) {
+		return await chaindb.getBlockByHash(hash).then((blocks) => {
+			return blocks;
+		}).catch (error => {
+			return new Error(error.message);
+		});
+	}
+
+	/*
 	 * CRITERIA : Modify the validateBlock() function to validate a block stored within levelDB
 	 */
 	async validateBlock(blockHeight) {
