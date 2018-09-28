@@ -150,7 +150,7 @@ exports.invalidateAddress = function(address) {
 				reject(error);
 			}
 
-			resolve(address);
+			resolve();
 		})
 	});
 }

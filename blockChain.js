@@ -26,7 +26,17 @@ class Blockchain {
 		this.getBlockHeight().then((height) => {
 			this.blockHeight = height;
 			if (height === -1) {
-				this.addBlock(new Block("First block in the chain - Genesis block"));
+				const star = {
+					ra: "0h 0m 0.0s",
+					dec: "0° 29'\'' 24.9",
+					story: new Buffer("First block in the chain - Genesis block").toString('hex'),
+				}
+
+				const body = {
+					address: "Gensis Block - Dummy Address",
+					star: star
+				}
+				this.addBlock(new Block(body));
 			}
 
 		}).catch(error => { console.log(error) });
@@ -46,7 +56,7 @@ class Blockchain {
 
 		// previous block hash
 		if (newBlock.height > 0) {
-			const prevBlock = await this.getBlock(this.blockHeight);
+			const prevBlock = await this.getBlockByHeight(this.blockHeight);
 			newBlock.previousBlockHash = prevBlock.hash;
 		}
 
@@ -56,7 +66,7 @@ class Blockchain {
 		this.blockHeight = newBlock.height;
 
 		// Adding block object to levelDB
-		await chaindb.addBlockToLevelDB(newBlock.height, JSON.stringify(newBlock)).then((result) => {
+		await chaindb.addBlock(newBlock.height, JSON.stringify(newBlock)).then((result) => {
 			res = result;
 		}).catch(error => { res = error; });
 
@@ -140,7 +150,7 @@ class Blockchain {
 
 		for (var i = 0; i <= height; i++) {
 			// get block from levelDB
-			let block = await this.getBlock(i);
+			let block = await this.getBlockByHeight(i);
 
 			// validate block
 			isValid = await this.validateBlock(block.height);

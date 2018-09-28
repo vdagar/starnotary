@@ -73,32 +73,6 @@ app.get('/', (request, response) => response.status(404).json({
 	"message": "Check README file for accepted endpoints"
 }));
 
-/*
- * CRITERIA: GET Block Endpoint. The web API contains a GET endpoint that responds to a request using a URL
- * path with a block height parameter or properly handles an error if the height parameter is out of bounds.
- */
-app.get('/block/:height', async (request, response) => {
-	try {
-		let blockHeight = await blockchain.getBlockHeight();
-		let height = parseInt(request.params.height);
-
-		if (height < 0 || height === undefined) {
-			throw new Error(`Invalid Height: ${height} passed`);
-		}
-
-		if (height > blockHeight) {
-			throw new Error("Height passed is greater then max height");
-		} else {
-			let block = await blockchain.getBlockByHeight(request.params.height);
-			response.send(block);
-		}
-	} catch (error) {
-		response.status(404).json ({
-			"status": 404,
-			"message": error.message
-		});
-	}
-});
 
 /* ==============================================================================
  * |			Blockchain ID validation routine			|
@@ -164,7 +138,9 @@ app.post('/block', [validateNewRequest], async (request, response) => {
 	try {
 		const isSignatureValid = await starRegistry.isMessageSignatureValid();
 
+		console.log(`isSignatureValid: ${isSignatureValid}`);
 		if (!isSignatureValid) {
+			console.log("Block 3");
 			throw new Error("Message Signature is not valid");
 		}
 
@@ -190,9 +166,10 @@ app.post('/block', [validateNewRequest], async (request, response) => {
 
 	await blockchain.addBlock(new Block(starRequest));
 	const blockHeight = await blockchain.getBlockHeight();
-	const block = await blockchain.getBlock(blockHeight);
+	const block = await blockchain.getBlockByHeight(blockHeight);
 
-	starRegistry.invalidateAddress(address);
+	console.log("Block 8");
+	await starRegistry.invalidateAddress(address);
 
 	response.status(201).send(block);
 });
@@ -233,6 +210,32 @@ app.get('/stars/hash:hash', async (request, response) => {
 		response.status(404).json({
 			"status": 404,
 			"message": `No Star Registered for this hash: ${hash}`
+		});
+	}
+});
+
+/*
+ * CRITERIA: Get star block by star block height with JSON response.
+ */
+app.get('/block/:height', async (request, response) => {
+	try {
+		let blockHeight = await blockchain.getBlockHeight();
+		let height = parseInt(request.params.height);
+
+		if (height < 0 || height === undefined) {
+			throw new Error(`Invalid Height: ${height} passed`);
+		}
+
+		if (height > blockHeight) {
+			throw new Error("Height passed is greater then max height");
+		} else {
+			let block = await blockchain.getBlockByHeight(request.params.height);
+			response.send(block);
+		}
+	} catch (error) {
+		response.status(404).json ({
+			"status": 404,
+			"message": error.message
 		});
 	}
 });

@@ -9,7 +9,7 @@ const db = level(chainDB);
 |  =============================================================*/
 
 // Add data to levelDB with key/value pair
-exports.addBlockToLevelDB = function (key, value) {
+exports.addBlock = function (key, value) {
 	return new Promise(function (resolve, reject) {
 		db.put(key, value, function (error) {
 			if (error) {
@@ -38,6 +38,9 @@ exports.getBlockByKey = function (key) {
 	});
 }
 
+/*
+ * Get the max height of the block in the database
+ */
 exports.getBlockHeight = function () {
 	return new Promise(function (resolve, reject) {
 		let height = -1;
@@ -52,6 +55,9 @@ exports.getBlockHeight = function () {
 	});
 }
 
+/*
+ * Get the complete blockchain from the database
+ */
 exports.getBlockChain = function () {
 	return new Promise(function (resolve, reject) {
 		let dataArray = [];
