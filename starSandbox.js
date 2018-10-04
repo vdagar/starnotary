@@ -18,7 +18,7 @@ const db = level(starDB);
 /*
  * Add data to levelDB with key/value pair
  */
-exports.saveNewRequestToDB = function (address) {
+exports.saveNewRequest = function (address) {
 	return new Promise((resolve, reject) => {
 		const requestTimeStamp = Date.now();
 		const message = `${address}:${requestTimeStamp}:starRegistry`;
@@ -47,7 +47,7 @@ exports.saveNewRequestToDB = function (address) {
  * If there is a request pending for the address then time left in
  * validation window will be updated and sent to the user.
  */
-exports.getPendingRequestFromDB = function (address) {
+exports.getPendingRequest = function (address) {
 	return new Promise((resolve, reject) => {
 		db.get(address, (error, result) => {
 			if (result == undefined) {
@@ -63,7 +63,7 @@ exports.getPendingRequestFromDB = function (address) {
 			const hasWindowExpired = result.requestTimeStamp < nowSubValidationWindow;
 
 			if (hasWindowExpired) {
-				resolve(this.saveNewRequestToDB(address));
+				return resolve(this.saveNewRequest(address));
 			} else {
 				const response = {
 					address: address,
@@ -71,7 +71,7 @@ exports.getPendingRequestFromDB = function (address) {
 					message: result.message,
 					validationWindow: Math.floor((result.requestTimeStamp - nowSubValidationWindow)/1000)
 				}
-				resolve(response);
+				return resolve(response);
 			}
 		});
 	});
@@ -80,7 +80,7 @@ exports.getPendingRequestFromDB = function (address) {
 /*
  * Verfiy the message signature for the pending request for the address
  */
-exports.verifySignatureFromDB = function(address, signature) {
+exports.verifySignature = function(address, signature) {
 	return new Promise((resolve, reject) => {
 		db.get(address, (error, result) => {
 			if (result === undefined) {
@@ -103,7 +103,7 @@ exports.verifySignatureFromDB = function(address, signature) {
 
 				if (hasWindowExpired) {
 					result.validationWindow = 0;
-					result.message = "Validation window expired. Try again"
+					result.message = "Validation window expired. Try again";
 				} else{
 					result.validationWindow = Math.floor((result.requestTimeStamp - nowSubValidationWindow) / 1000);
 					try {

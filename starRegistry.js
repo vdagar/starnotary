@@ -39,7 +39,6 @@ class starRegistry {
 	validateNewRequest () {
 		const MAX_BYTES_STORY = 500;
 		const { star } = this.request.body;
-		const { dec, ra, story } = star;
 
 		if (!this.validateAddress()) {
 			throw new Error("Address cannot be empty. Please provide a valid address");
@@ -49,17 +48,19 @@ class starRegistry {
 			throw new Error("Star cannot be empty. Please provide valid star");
 		}
 
+		const { dec, ra, story } = star;
+
 		if (typeof dec !== 'string' || typeof ra !== 'string' || typeof story !== 'string' || !dec.length || !ra.length || !story.length) {
-			throw new Error("Star information should include string properties dec, ra and story");
+			throw new Error("Star information should include non empty string properties dec, ra and story");
 		}
 
 		if (new Buffer.from(story).length > MAX_BYTES_STORY) {
 			throw new Error("Story size cannot be more than 500 bytes");
 		}
 
-		const isValid = ((str) => /^[\x00-\x7F]*$/.test(str))
+		const isValid = ((str) => /^[\x00-\x7F]*$/.test(str));
 
-		if (!isValid) {
+		if (!isValid(story)) {
 			throw new Error("Story can only contain ASCII characters. Please remove non ASCII charaters");
 		}
 	}
@@ -90,7 +91,7 @@ class starRegistry {
 	 * Save the pending request in the database.
 	 */
 	async saveNewRequest(address) {
-		return await starDB.saveNewRequestToDB(address);
+		return await starDB.saveNewRequest(address);
 	}
 
 	async isMessageSignatureValid(address) {
