@@ -53,7 +53,7 @@ class starRegistry {
 			throw new Error("Star information should include string properties dec, ra and story");
 		}
 
-		if (new Buffer(story) > 500) {
+		if (new Buffer.from(story).length > MAX_BYTES_STORY) {
 			throw new Error("Story size cannot be more than 500 bytes");
 		}
 
@@ -68,14 +68,22 @@ class starRegistry {
 	 * Get the pending request from the database for this address.
 	 */
 	async getPendingRequest(address) {
-		return await starDB.getPendingRequestFromDB(address);
+		try {
+			return await starDB.getPendingRequest(address);
+		} catch (error) {
+			throw error;
+		}
 	}
 
 	/*
 	 * Verfiy the message signature for the pending request from the address.
 	 */
 	async verifyMessageSignature(address, signature) {
-		return await starDB.verifySignatureFromDB(address, signature);
+		try {
+			return await starDB.verifySignature(address, signature);
+		} catch (error) {
+			throw error;
+		}
 	}
 
 	/*

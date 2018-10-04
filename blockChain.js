@@ -29,7 +29,7 @@ class Blockchain {
 				const star = {
 					ra: "0h 0m 0.0s",
 					dec: "0° 29'\'' 24.9",
-					story: new Buffer("First block in the chain - Genesis block").toString('hex'),
+					story: new Buffer.from("First block in the chain - Genesis block").toString('hex'),
 				}
 
 				const body = {
@@ -77,7 +77,7 @@ class Blockchain {
 	 * CRITERIA : Modify getBlockHeight() function to retrieve current block height within the LevelDB chain.
 	 */
 	async getBlockHeight() {
-		return await chaindb.getBlockHeight().then((height) => { return height; }).catch(error => { console.log(error); });
+		return await chaindb.getBlockHeight().then((height) => { return height; }).catch(error => { throw error; });
 	}
 
 	/*
@@ -96,22 +96,22 @@ class Blockchain {
 	 * CRITERIA: Get star block by wallet address (blockchain identity) with JSON response.
 	 */
 	async getBlockByAddress(address) {
-		return await chaindb.getBlockByAddress(address).then((blocks) => {
-			return blocks;
-		}).catch (error => {
-			return new Error(error.message);
-		});
+		try {
+			return await chaindb.getBlockByAddress(address);
+		} catch(error) {
+			throw error;
+		}
 	}
 
 	/*
 	 * CRITERIA: Get star block by hash with JSON response.
 	 */
 	async getBlockByHash(hash) {
-		return await chaindb.getBlockByHash(hash).then((blocks) => {
-			return blocks;
-		}).catch (error => {
-			return new Error(error.message);
-		});
+		try {
+			return await chaindb.getBlockByHash(hash);
+		} catch (error) {
+			throw error;
+		}
 	}
 
 	/*

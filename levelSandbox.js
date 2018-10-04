@@ -32,7 +32,7 @@ exports.getBlockByKey = function (key) {
 			}
 
 			block = JSON.parse(value);
-			block.body.star.storyDecoded = new Buffer(block.body.star.story, 'hex').toString();
+			block.body.star.storyDecoded = new Buffer.from(block.body.star.story, 'hex').toString();
 			resolve(block);
 		});
 	});
@@ -78,6 +78,7 @@ exports.getBlockChain = function () {
 exports.getBlockByAddress = function(address) {
 	let addressBlocks = [];
 	let block;
+	let found = false;
 
 	return new Promise((resolve, reject) => {
 
@@ -86,14 +87,19 @@ exports.getBlockByAddress = function(address) {
 				block = JSON.parse(data.value);
 
 				if (block.body.address === address) {
-					block.body.star.storyDecoded = new Buffer(block.body.star.story, 'hex').toString();
+					block.body.star.storyDecoded = new Buffer.from(block.body.star.story, 'hex').toString();
 					addressBlocks.push(block);
+					found = true;
 				}
 			}
 		}).on('error', (error) => {
-			reject(error);
+			reject(new Error("Not Found"));
 		}).on('close', () => {
-			resolve(addressBlocks);
+			if (found) {
+				resolve(addressBlocks);
+			} else {
+				reject(new Error("Star(s) Not Found"));
+			}
 		})
 	});
 }
@@ -105,18 +111,20 @@ exports.getBlockByHash = function(hash) {
 
 	return new Promise((resolve, reject) => {
 		db.createReadStream().on('data', (data) => {
+
 			if (!(parseInt(data.key) === 0)) {
-				block = JSON.parse(data.value);
+
+				let block = JSON.parse(data.value);
 
 				if (block.hash === hash) {
-					block.body.star.storyDecoded = new Buffer(block.body.star.story, 'hex').toString();
+					block.body.star.storyDecoded = new Buffer.from(block.body.star.story, 'hex').toString();
 					return resolve(block);
 				}
 			}
 		}).on('error', (error) => {
 			return reject(error);
 		}).on('close', () => {
-			return reject("Not Found");
+			return reject(new Error("Not Found"));
 		});
 	});
 }

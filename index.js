@@ -112,12 +112,11 @@ app.post('/message-signature/validate', [validateAddress, validateSignature], as
 		const result = await starRegistry.verifyMessageSignature(address, signature);
 
 		if (result.registerStar) {
-			response.json(result);
+			response.status(200).json(result);
 		} else {
 			response.status(401).json(result);
 		}
 	} catch (error) {
-		console.log("error caught");
 		response.status(404).json({
 			"status": 404,
 			"message": error.message
@@ -138,9 +137,7 @@ app.post('/block', [validateNewRequest], async (request, response) => {
 	try {
 		const isSignatureValid = await starRegistry.isMessageSignatureValid();
 
-		console.log(`isSignatureValid: ${isSignatureValid}`);
 		if (!isSignatureValid) {
-			console.log("Block 3");
 			throw new Error("Message Signature is not valid");
 		}
 
@@ -168,7 +165,6 @@ app.post('/block', [validateNewRequest], async (request, response) => {
 	const blockHeight = await blockchain.getBlockHeight();
 	const block = await blockchain.getBlockByHeight(blockHeight);
 
-	console.log("Block 8");
 	await starRegistry.invalidateAddress(address);
 
 	response.status(201).send(block);
@@ -190,7 +186,7 @@ app.get('/stars/address:address', async (request, response) => {
 	} catch (error) {
 		response.status(401).json({
 			"status": 401,
-			"message": "Star(s) Not Found"
+			"message": error.message
 		});
 	}
 
@@ -209,7 +205,7 @@ app.get('/stars/hash:hash', async (request, response) => {
 	} catch(error)  {
 		response.status(404).json({
 			"status": 404,
-			"message": `No Star Registered for this hash: ${hash}`
+			"message": error.message
 		});
 	}
 });
@@ -223,11 +219,11 @@ app.get('/block/:height', async (request, response) => {
 		let height = parseInt(request.params.height);
 
 		if (height < 0 || height === undefined) {
-			throw new Error(`Invalid Height: ${height} passed`);
+			throw new Error('Invalid height passed');
 		}
 
 		if (height > blockHeight) {
-			throw new Error("Height passed is greater then max height");
+			throw new Error("Height passed is greater then max numbers of blocks in blockchain");
 		} else {
 			let block = await blockchain.getBlockByHeight(request.params.height);
 			response.send(block);
