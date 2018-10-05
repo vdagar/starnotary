@@ -13,4 +13,7 @@ class Block {
 	}
 }
 
+/*
+ * export the module as it is required in other files
+ */
 module.exports = Block;

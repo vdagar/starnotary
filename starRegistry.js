@@ -95,10 +95,12 @@ class starRegistry {
 		return await starDB.saveNewRequest(address);
 	}
 
+	/* Check for the validity for the message signature */
 	async isMessageSignatureValid(address) {
 		return await starDB.isSignatureValid(this.request.body.address);
 	}
 
+	/* Remove address from the database once star is added in the database */
 	async invalidateAddress(address) {
 		return await starDB.invalidateAddress(address);
 	}

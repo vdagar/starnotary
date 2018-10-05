@@ -1,4 +1,8 @@
+/*
+ * Using strict mode to avoid some unwanted errors
+ */
 "use strict";
+
 /*
  * CRITERIA: Project uses one of these 3 Node.js frameworks. Project is using express.js framework.
  */
@@ -111,8 +115,11 @@ app.post('/message-signature/validate', [validateAddress, validateSignature], as
 
 	try {
 		const {address, signature} = request.body;
+
+		/* Verfiy the message signature of the validation request */
 		const result = await starRegistry.verifyMessageSignature(address, signature);
 
+		/* Return ture if the message verification successful other wise return false */
 		if (result.registerStar) {
 			response.status(200).json(result);
 		} else {
@@ -139,8 +146,10 @@ app.post('/block', [validateNewRequest], async (request, response) => {
 	let star = {};
 
 	try {
+		/* Check if the message signaure is valid */
 		const isSignatureValid = await starRegistry.isMessageSignatureValid();
 
+		/* Throw error if message signature is not valid */
 		if (!isSignatureValid) {
 			throw new Error("Message Signature is not valid");
 		}
@@ -151,26 +160,36 @@ app.post('/block', [validateNewRequest], async (request, response) => {
 			"message": error.message
 		});
 
+		/* Return in case of any errors */
 		return;
 	}
 
+	/* extract address, star and star story from the request body */
 	const starRequest = {address, star} = request.body;
 	const story = star.story;
 
+	/* Create star request to add the same in the blockchain */
 	starRequest.star = {
 		dec: star.dec,
 		ra: star.ra,
-		story: new Buffer.from(story).toString('hex'),
+		story: new Buffer.from(story).toString('hex'), /* Encode the story in hex form */
 		mag: star.mag,
 		con: star.con
 	}
 
+	/* Add block in the blockchain */
 	await blockchain.addBlock(new Block(starRequest));
+
+	/* Get the max height of the block from the blockchain */
 	const blockHeight = await blockchain.getBlockHeight();
+
+	/* Get the block by block height from the database */
 	const block = await blockchain.getBlockByHeight(blockHeight);
 
+	/* Once a star is registered against the address remove that address from the star database */
 	await starRegistry.invalidateAddress(address);
 
+	/* send the added block block */
 	response.status(201).send(block);
 });
 
@@ -183,11 +202,16 @@ app.post('/block', [validateNewRequest], async (request, response) => {
  */
 app.get('/stars/address:address', async (request, response) => {
 	try {
+		/* Get the address from the request body */
 		const address = request.params.address.slice(1);
+
+		/* Reterive array of blocks based on the address from the blockchain database */
 		const blocks = await blockchain.getBlockByAddress(address);
 
+		/* If everything goes right send back the array of blocks */
 		response.send(blocks);
 	} catch (error) {
+		/* Return error in case of any */
 		response.status(401).json({
 			"status": 401,
 			"message": error.message
@@ -202,11 +226,16 @@ app.get('/stars/address:address', async (request, response) => {
 app.get('/stars/hash:hash', async (request, response) => {
 
 	try {
+		/* Extract hash from the request */
 		const hash = request.params.hash.slice(1);
+
+		/* Get the block based on hash from the blockchain database */
 		const blocks = await blockchain.getBlockByHash(hash);
 
+		/* Return block from to the client */
 		response.send(blocks);
 	} catch(error)  {
+		/* Return error in case of any */
 		response.status(404).json({
 			"status": 404,
 			"message": error.message
@@ -219,20 +248,27 @@ app.get('/stars/hash:hash', async (request, response) => {
  */
 app.get('/block/:height', async (request, response) => {
 	try {
+		/* Get the max height of the block from the blockchain database */
 		let blockHeight = await blockchain.getBlockHeight();
+
+		/* Extract height from the request */
 		let height = parseInt(request.params.height);
 
+		/* Check if height is less then zero or undefined. If so throw error */
 		if (height < 0 || height === undefined) {
 			throw new Error('Invalid height passed');
 		}
 
+		/* Throw error is the height passed is larger then the max height */
 		if (height > blockHeight) {
 			throw new Error("Height passed is greater then max numbers of blocks in blockchain");
 		} else {
+			/* If height is in the range then get the block from the data base and return */
 			let block = await blockchain.getBlockByHeight(request.params.height);
 			response.send(block);
 		}
 	} catch (error) {
+		/* Return Error in case of any */
 		response.status(404).json ({
 			"status": 404,
 			"message": error.message

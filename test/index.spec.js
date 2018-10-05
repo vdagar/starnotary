@@ -24,8 +24,10 @@ const keyPair = bitcoin.ECPair.makeRandom();
 const privateKey = keyPair.d.toBuffer(32);
 const address = keyPair.getAddress();
 
+/* Test case for the requestValidation endpoints */
 describe('POST /requestValidation', () => {
 
+	/* Check if the response from the server is as per the requirements */
 	it('Should respond with message details, request timestamp and time remaining for validation window', () => {
 		return chai.request(baseUrl)
 			.post('/requestValidation')
@@ -51,9 +53,12 @@ describe('POST /requestValidation', () => {
 	});
 });
 
+/* Tests for /message-signature/validate endpoint */
 describe('POST /message-signature/validate', function() {
 
 	this.timeout(1000);
+
+	/* Test the valid case where signature and address passed are both correct */
 	it('Should respond with messageSignature valid', (done) => {
 
 		const signature = fs.readFileSync('database/signature.txt').toString();
@@ -70,6 +75,7 @@ describe('POST /message-signature/validate', function() {
 			});
 	});
 
+	/* Test invalid case where address passed to the endpoint is invalid */
 	it('Should respond with error because of wrong address', (done) => {
 		const signature = fs.readFileSync('database/signature.txt').toString();
 		chai.request(baseUrl)
@@ -85,10 +91,12 @@ describe('POST /message-signature/validate', function() {
 	});
 });
 
+/* Tests for /block endpoints */
 describe('POST /block', function() {
 
 	this.timeout(1000);
 
+	/* Test the valid case where all the data provided to the endpoint is correct */
 	it('Should respond with block added in the block chain with the star data', () => {
 		return chai.request(baseUrl)
 			.post('/block')
@@ -119,6 +127,7 @@ describe('POST /block', function() {
 			});
 	});
 
+	/* Test case where the address passed is not authorized to register a star */
 	it('Should not register star because of address is Not Authorized', () => {
 		return chai.request(baseUrl)
 			.post('/block')
@@ -138,6 +147,7 @@ describe('POST /block', function() {
 			});
 	});
 
+	/* Test the error case where the address passed to the endpoint is invalid */
 	it('Should not register star because of wrong address', () => {
 		return chai.request(baseUrl)
 			.post('/block')
@@ -157,7 +167,7 @@ describe('POST /block', function() {
 			});
 	});
 
-
+	/* Test the error case where ra proprty of the star is missing */
 	it('Should not register star because of missing ra', () => {
 		return chai.request(baseUrl)
 			.post('/block')
@@ -176,6 +186,7 @@ describe('POST /block', function() {
 			});
 	});
 
+	/* Test the error case where dec proprty of the star is missing */
 	it('Should not register star because of missing dec', () => {
 		return chai.request(baseUrl)
 			.post('/block')
@@ -194,6 +205,7 @@ describe('POST /block', function() {
 			});
 	});
 
+	/* Test the error case where story proprty of the star is missing */
 	it('Should not register star because of missing story', () => {
 		return chai.request(baseUrl)
 			.post('/block')
@@ -212,6 +224,7 @@ describe('POST /block', function() {
 			});
 	});
 
+	/* Test the error case where address is null */
 	it('Should not register star because of null address', () => {
 		return chai.request(baseUrl)
 			.post('/block')
@@ -231,6 +244,7 @@ describe('POST /block', function() {
 			});
 	}); 
 
+	/* Test the error case where ra proporty of the star is null */
 	it('Should not register star because of null ra', () => {
 		return chai.request(baseUrl)
 			.post('/block')
@@ -250,6 +264,7 @@ describe('POST /block', function() {
 			});
 	});
 
+	/* Test the error case where dec proporty of the star is null */
 	it('Should not register star because of null dec', () => {
 		return chai.request(baseUrl)
 			.post('/block')
@@ -269,6 +284,7 @@ describe('POST /block', function() {
 			});
 	});
 
+	/* Test the error case where story proporty of the star is null */
 	it('Should not register star because of null story', () => {
 		return chai.request(baseUrl)
 			.post('/block')
@@ -288,6 +304,7 @@ describe('POST /block', function() {
 			});
 	});
 
+	/* Test the error case where the star is null */
 	it('Should not register star because of missing star', () => {
 		return chai.request(baseUrl)
 			.post('/block')
@@ -302,6 +319,7 @@ describe('POST /block', function() {
 			});
 	});
 
+	/* Test the error case where story proporty of the star is more then 500 bytes */
 	it('Should not register star because of story length is > 500 bytes', () => {
 		return chai.request(baseUrl)
 			.post('/block')
@@ -321,6 +339,7 @@ describe('POST /block', function() {
 			});
 	});
 
+	/* Test the error case where story proporty of the star contains non ascii characters */
 	it('Should not register star because of story containing non ASCII charaters', () => {
 		return chai.request(baseUrl)
 			.post('/block')
@@ -341,10 +360,12 @@ describe('POST /block', function() {
 	});
 });
 
+/* Tests to /stars/address:address endpoint */
 describe('GET /stars/address:address', function() {
 
 	this.timeout(1000);
 
+	/* Test the valid case where address provided is correct */
 	it('Should return with valid block from the blockchain', (done) => {
 		chai.request(baseUrl)
 			.get(`/stars/address:${address}`)
@@ -364,6 +385,7 @@ describe('GET /stars/address:address', function() {
 			});
 	});
 
+	/* Test the invalid case where address provided is incorrect */
 	it('Should return with with an error message', (done) => {
 		chai.request(baseUrl)
 			.get(`/stars/address:${"address"}`)
@@ -377,10 +399,12 @@ describe('GET /stars/address:address', function() {
 	});
 });
 
+/* Test the /stars/hash:hash endpoint */
 describe('GET /stars/hash:hash', function() {
 
 	this.timeout(2000);
 
+	/* Test the valid case where hash provided is correct */
 	it('Should return with valid block from the blockchain', (done) => {
 
 		const hash = fs.readFileSync('./database/hash.txt');
@@ -400,6 +424,7 @@ describe('GET /stars/hash:hash', function() {
 			});
 	});
 
+	/* Test the invalid case where hash provided is incorrect */
 	it('Should return with with an error message', (done) => {
 		chai.request(baseUrl)
 			.get(`/stars/hash:${"hash"}`)
@@ -413,10 +438,12 @@ describe('GET /stars/hash:hash', function() {
 	});
 });
 
+/* Test cases for /block/:height endpoint */
 describe('GET /block/:height', function() {
 
 	this.timeout(2000);
 
+	/* Test for valid case where height provided is within the range */
 	it('Should return with valid block from the blockchain', (done) => {
 
 		chai.request(baseUrl)
@@ -434,6 +461,7 @@ describe('GET /block/:height', function() {
 			});
 	});
 
+	/* Test for invalid case where height provided is greater then max height in the blockchain */
 	it('Should return with with an error message because block height is too big', (done) => {
 		chai.request(baseUrl)
 			.get(`/block/1000`)
@@ -446,6 +474,7 @@ describe('GET /block/:height', function() {
 			});
 	});
 
+	/* Test for invalid case where height provided is negative */
 	it('Should return with with an error message because height passed in -1', (done) => {
 		chai.request(baseUrl)
 			.get(`/block/-1`)
@@ -459,6 +488,7 @@ describe('GET /block/:height', function() {
 	});
 });
 
+/* Test case for root endpoint. If request is sent to root endpoint it should return error */
 describe('GET /', function() {
 	it('Should return with with an error message because root url is not valid', (done) => {
 		chai.request(baseUrl)

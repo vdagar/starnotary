@@ -88,7 +88,7 @@ class Blockchain {
 		return await chaindb.getBlockByKey(blockHeight).then((block) => {
 			return block;
 		}).catch(error => {
-			console.log(error);
+			throw error;
 		});
 	}
 
@@ -185,4 +185,7 @@ class Blockchain {
 	}
 }
 
+/*
+ * export the module as it is required in other files
+ */
 module.exports = Blockchain
