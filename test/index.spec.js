@@ -1,3 +1,4 @@
+"use strict";
 /*
  * Configure bitcoin and bitcoin message to generate random keypair address
  */
@@ -352,7 +353,7 @@ describe('GET /stars/address:address', function() {
 			.then((response) => {
 				expect(response.status).to.be.eql(200);
 				expect(response.body).to.be.an('array').that.is.not.empty;
-				for(i in response.body) {
+				for(let i in response.body) {
 					expect(response.body[i]).to.have.property('hash');
 					expect(response.body[i]).to.have.property('height');
 					expect(response.body[i]).to.have.property('body');

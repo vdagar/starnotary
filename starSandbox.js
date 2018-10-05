@@ -1,3 +1,4 @@
+"use strict";
 /*
  * Configure bitcoin and bitcoin message to verify the message signature
  */

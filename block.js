@@ -1,3 +1,4 @@
+"use strict";
 /* ===== Block Class ==============================
 |  Class with a constructor for block		   |
 |  ===============================================*/

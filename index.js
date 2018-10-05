@@ -1,3 +1,4 @@
+"use strict";
 /*
  * CRITERIA: Project uses one of these 3 Node.js frameworks. Project is using express.js framework.
  */
@@ -14,12 +15,12 @@ const PORT = 8000;
 /*
  * Using middleware pattern for validating address is passed in the request
  */
-validateAddress = async(request, response, next) => {
+const validateAddress = async(request, response, next) => {
 	try {
 		const starRegistry = new StarRegistry(request);
 		starRegistry.validateAddress();
 		next();
-	} catch {
+	} catch (error) {
 		response.status(404).json({
 			"status": 404,
 			"message": error.message
@@ -29,7 +30,7 @@ validateAddress = async(request, response, next) => {
 /*
  * Using middleware pattern for validating signature is passed in the request
  */
-validateSignature = async(request, response, next) => {
+const validateSignature = async(request, response, next) => {
 	try {
 		const starRegistry = new StarRegistry(request);
 		starRegistry.validateSignature();
@@ -45,7 +46,7 @@ validateSignature = async(request, response, next) => {
 /*
  * Using middleware pattern for validating new star registry is passed in the request as per the requirements
  */
-validateNewRequest = async(request, response, next) => {
+const validateNewRequest = async(request, response, next) => {
 	try {
 		const starRegistry = new StarRegistry(request);
 		starRegistry.validateNewRequest();
@@ -84,6 +85,7 @@ app.get('/', (request, response) => response.status(404).json({
 app.post('/requestValidation', [validateAddress], async(request, response) => {
 	const starRegistry = new StarRegistry(request);
 	const address = request.body.address;
+	let value;
 
 	try {
 		/*
@@ -133,6 +135,8 @@ app.post('/message-signature/validate', [validateAddress, validateSignature], as
  */
 app.post('/block', [validateNewRequest], async (request, response) => {
 	const starRegistry = new StarRegistry(request);
+	let address;
+	let star = {};
 
 	try {
 		const isSignatureValid = await starRegistry.isMessageSignatureValid();

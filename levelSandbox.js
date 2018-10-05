@@ -1,3 +1,4 @@
+"use strict";
 /* Configure levelDB and define the function to get and put data into DB */
 
 const level = require('level');
@@ -31,7 +32,7 @@ exports.getBlockByKey = function (key) {
 				reject(error);
 			}
 
-			block = JSON.parse(value);
+			let block = JSON.parse(value);
 			block.body.star.storyDecoded = new Buffer.from(block.body.star.story, 'hex').toString();
 			resolve(block);
 		});

@@ -1,4 +1,4 @@
-
+"use strict";
 /**
  * CRITERIA: Configure simpleChain.js with levelDB to persist blockchain dataset using the level Node.js library.
  */

@@ -1,3 +1,4 @@
+"use strict";
 /*
  * Star Database for storing the request before they can be validated
  * and entered in the blockchain
