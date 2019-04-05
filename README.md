@@ -1,6 +1,6 @@
-Project: Build a Private Blockchain Notary Service
+# Project: Build a Private Blockchain Notary Service
 
-Project Introduction
+## Project Introduction
 Welcome to Project 4: Build a Private Blockchain Notary Service!
 
 In this project, you'll build a Star Registry service that allows users to claim ownership of their favorite star in the night sky.
@@ -12,7 +12,7 @@ You'll do this using skills you've learn throughout the program, and by solving 
 The goal is to apply the tools and knowledge you've developed so far to solve new problems that are relevant to your career as a
 blockchain developer.
 
-Why this project?
+## Why this project?
 With this project you will demonstrate your ability to use Node.js Web APIs frameworks to notarize ownership of a digital asset
 by implement algorithms to sign and verify messages.
 
@@ -25,7 +25,7 @@ This project also helps set you up for success later in the program. Later, you�
 use similar features using smart contracts. Smart contracts are an exciting blockchain concept that you'll be learning all about
 in the next course!
 
-What will I learn?
+## What will I learn?
 This project will combine various ideas and skills we’ve been practicing throughout the course as well as require you to solve
 new challenges you haven't quite seen before.
 
@@ -38,7 +38,7 @@ Notarize ownership of a digital asset using message signatures and validation
 	This project helps build on the skills you learned throughout Course 3: Web Services. You will apply these
 	skills using real-world technologies to get hands-on with the tools used to create web API's.
 
-How does this help my career?
+## How does this help my career?
 In this project, you’ll demonstrate creating and working with web APIs that notarizes ownership of a digital asset using message
 signatures and validation. To do so, you’ll demonstrate your understanding of many core blockchain concepts such as encoding and
 decoding transaction data, configuring your blockchain to handle wallet identities, and configuring your blockchain to properly
@@ -48,7 +48,7 @@ This project is a great step toward getting started as a blockchain developer. T
 personal interest, to work on more complicated projects, or to use as a great portfolio item to show potential employers.
 
 
-Getting started
+## Getting started
 	Open a terminal and install node.js framework.
     	Install crypto.js, level.js, express.js and body-parser.js framworks.
 
@@ -57,7 +57,7 @@ Getting started
 	npm install express --save
 	npm install body-parser --save
 
-Testing
+## Testing
 Run the server using one of the below method
 
 	node index.js
@@ -72,8 +72,11 @@ Use software like postman or simple CURL on the terminal to send the requests to
 curl http://localhost:8000 with one of the below supported endpoints:
 
 =============================================
-1. Configure Blockchain ID validation routine
+
+### 1. Configure Blockchain ID validation routine
+
 =============================================
+
 
 POST /requestValidation
 
@@ -95,8 +98,11 @@ expample:
 		}'
 
 =======================================
-2. Configure Star Registration Endpoint
+
+### 2. Configure Star Registration Endpoint
+
 =======================================
+
 
 POST /block
 
@@ -113,8 +119,11 @@ example:
 		}'
 
 ========================
-3. Configure Star Lookup
+
+### 3. Configure Star Lookup
+
 ========================
+
 
 GET /stars/address:[ADDRESS]
 
@@ -130,4 +139,3 @@ GET /block/[HEIGHT]
 
 example:
 	curl http://localhost:8000/block/0
-
